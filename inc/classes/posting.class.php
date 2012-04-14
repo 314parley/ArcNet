@@ -386,10 +386,11 @@ class Posting {
 		$badlinks = array_map('rtrim', file(KU_ROOTDIR . 'spam.txt', FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES));
 
 		foreach ($badlinks as $badlink) {
-			if (stripos($_POST['message'], $badlink) !== false) {
+			//also check the subject, name, and email field for spamming techniques. thanks grumpy
+			if (stripos($_POST['message'], $badlink) !== false || stripos($_POST['subject'], $badlink) !== false || stripos($_POST['name'], $badlink) !== false || stripos($_POST['em'], $badlink) !== false) {
 				/* They included a blacklisted link in their post. Ban them for an hour */
-				$bans_class->BanUser($_SERVER['REMOTE_ADDR'], 'board.php', 1, 3600, '', _gettext('Posting a blacklisted link.') . ' (' . $badlink . ')', $_POST['message']);
-				exitWithErrorPage(sprintf(_gettext('Blacklisted link ( %s ) detected.'), $badlink));
+				$bans_class->BanUser($_SERVER['REMOTE_ADDR'], 'board.php', 1, 3600, '', _gettext('Posting a blacklisted link or blacklisted text.') . ' (' . $badlink . ')', $_POST['message']);
+				exitWithErrorPage(sprintf(_gettext('Blacklisted link or text ( %s ) detected.'), $badlink));
 			}
 		}
 	}
